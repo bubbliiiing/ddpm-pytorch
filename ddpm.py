@@ -107,7 +107,7 @@ class Diffusion(object):
         with torch.no_grad():
             randn_in    = torch.randn((1, 1)).cuda() if self.cuda else torch.randn((1, 1))
 
-            test_images = self.net.sample(4, randn_in.device)
+            test_images = self.net.module.sample(1, randn_in.device)
             test_images = postprocess_output(test_images[0].cpu().data.numpy().transpose(1, 2, 0))
 
             Image.fromarray(np.uint8(test_images)).save(save_path)

@@ -30,7 +30,7 @@ def fit_one_epoch(diffusion_model_train, diffusion_model, loss_history, optimize
 
         else:
             from torch.cuda.amp import autocast
-
+            optimizer.zero_grad()
             with autocast():
                 diffusion_loss = diffusion_model_train(images)
             #----------------------#

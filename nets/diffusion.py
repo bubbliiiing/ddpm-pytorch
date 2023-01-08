@@ -57,12 +57,18 @@ class GaussianDiffusion(nn.Module):
         # 转换成torch.tensor来处理
         to_torch = partial(torch.tensor, dtype=torch.float32)
 
+        # betas             [0.0001, 0.00011992, 0.00013984 ... , 0.02]
         self.register_buffer("betas", to_torch(betas))
+        # alphas            [0.9999, 0.99988008, 0.99986016 ... , 0.98]
         self.register_buffer("alphas", to_torch(alphas))
+        # alphas_cumprod    [9.99900000e-01, 9.99780092e-01, 9.99640283e-01 ... , 4.03582977e-05]
         self.register_buffer("alphas_cumprod", to_torch(alphas_cumprod))
 
+        # sqrt(alphas_cumprod)
         self.register_buffer("sqrt_alphas_cumprod", to_torch(np.sqrt(alphas_cumprod)))
+        # sqrt(1 - alphas_cumprod)
         self.register_buffer("sqrt_one_minus_alphas_cumprod", to_torch(np.sqrt(1 - alphas_cumprod)))
+        # sqrt(1 / alphas)
         self.register_buffer("reciprocal_sqrt_alphas", to_torch(np.sqrt(1 / alphas)))
 
         self.register_buffer("remove_noise_coeff", to_torch(betas / np.sqrt(1 - alphas_cumprod)))
