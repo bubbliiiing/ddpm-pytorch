@@ -147,7 +147,6 @@ class GaussianDiffusion(nn.Module):
             loss = F.l1_loss(estimated_noise, noise)
         elif self.loss_type == "l2":
             loss = F.mse_loss(estimated_noise, noise)
-
         return loss
 
     def forward(self, x, y=None):

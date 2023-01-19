@@ -24,10 +24,10 @@ class Diffusion(object):
         #-----------------------------------------------#
         #   输入图像大小的设置
         #-----------------------------------------------#
-        "input_shape"       : (64, 64),
-        #---------------------------------------------------------------------#
+        "input_shape"       : (32, 32),
+        #-----------------------------------------------#
         #   betas相关参数
-        #---------------------------------------------------------------------#
+        #-----------------------------------------------#
         "schedule"          : "linear",
         "num_timesteps"     : 1000,
         "schedule_low"      : 1e-4,
@@ -72,7 +72,6 @@ class Diffusion(object):
         print('{} model loaded.'.format(self.model_path))
 
         if self.cuda:
-            self.net = nn.DataParallel(self.net)
             self.net = self.net.cuda()
 
     #---------------------------------------------------#
@@ -107,7 +106,7 @@ class Diffusion(object):
         with torch.no_grad():
             randn_in    = torch.randn((1, 1)).cuda() if self.cuda else torch.randn((1, 1))
 
-            test_images = self.net.module.sample(1, randn_in.device)
+            test_images = self.net.sample(1, randn_in.device, use_ema=False)
             test_images = postprocess_output(test_images[0].cpu().data.numpy().transpose(1, 2, 0))
 
             Image.fromarray(np.uint8(test_images)).save(save_path)

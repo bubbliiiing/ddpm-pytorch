@@ -21,10 +21,10 @@ def fit_one_epoch(diffusion_model_train, diffusion_model, loss_history, optimize
         with torch.no_grad():
             if cuda:
                 images = images.cuda(local_rank)
-            
+        
         if not fp16:
             optimizer.zero_grad()
-            diffusion_loss = diffusion_model_train(images)
+            diffusion_loss = torch.mean(diffusion_model_train(images))
             diffusion_loss.backward()
             optimizer.step()
 
@@ -32,13 +32,14 @@ def fit_one_epoch(diffusion_model_train, diffusion_model, loss_history, optimize
             from torch.cuda.amp import autocast
             optimizer.zero_grad()
             with autocast():
-                diffusion_loss = diffusion_model_train(images)
+                diffusion_loss = torch.mean(diffusion_model_train(images))
             #----------------------#
             #   反向传播
             #----------------------#
             scaler.scale(diffusion_loss).backward()
             scaler.step(optimizer)
             scaler.update()
+        diffusion_model.update_ema()
 
         total_loss += diffusion_loss.item()
         if local_rank == 0:
