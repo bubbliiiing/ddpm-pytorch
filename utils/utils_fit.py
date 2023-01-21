@@ -27,7 +27,6 @@ def fit_one_epoch(diffusion_model_train, diffusion_model, loss_history, optimize
             diffusion_loss = torch.mean(diffusion_model_train(images))
             diffusion_loss.backward()
             optimizer.step()
-
         else:
             from torch.cuda.amp import autocast
             optimizer.zero_grad()
@@ -47,8 +46,6 @@ def fit_one_epoch(diffusion_model_train, diffusion_model, loss_history, optimize
                                 'lr'            : get_lr(optimizer)})
             pbar.update(1)
     
-    print('Show_result:')
-    show_result(epoch + 1, diffusion_model, images.device)
     total_loss = total_loss / epoch_step
     
     if local_rank == 0:
@@ -56,7 +53,9 @@ def fit_one_epoch(diffusion_model_train, diffusion_model, loss_history, optimize
         print('Epoch:'+ str(epoch + 1) + '/' + str(Epoch))
         print('Total_loss: %.4f ' % (total_loss))
         loss_history.append_loss(epoch + 1, total_loss = total_loss)
-
+        
+        print('Show_result:')
+        show_result(epoch + 1, diffusion_model, images.device)
         #----------------------------#
         #   每若干个世代保存一次
         #----------------------------#
