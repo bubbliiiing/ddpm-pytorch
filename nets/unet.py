@@ -4,6 +4,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+class SiLU(nn.Module):  
+    # SiLU激活函数
+    @staticmethod
+    def forward(x):
+        return x * torch.sigmoid(x)
 
 def get_norm(norm, num_channels, num_groups):
     if norm == "in":
@@ -105,7 +110,7 @@ class AttentionBlock(nn.Module):
 #------------------------------------------#
 class ResidualBlock(nn.Module):
     def __init__(
-        self, in_channels, out_channels, dropout, time_emb_dim=None, num_classes=None, activation=F.relu,
+        self, in_channels, out_channels, dropout, time_emb_dim=None, num_classes=None, activation=SiLU(),
         norm="gn", num_groups=32, use_attention=False,
     ):
         super().__init__()
@@ -158,7 +163,7 @@ class ResidualBlock(nn.Module):
 class UNet(nn.Module):
     def __init__(
         self, img_channels, base_channels=128, channel_mults=(1, 2, 4, 8),
-        num_res_blocks=3, time_emb_dim=128 * 4, time_emb_scale=1.0, num_classes=None, activation=F.silu,
+        num_res_blocks=3, time_emb_dim=128 * 4, time_emb_scale=1.0, num_classes=None, activation=SiLU(),
         dropout=0.1, attention_resolutions=(1,), norm="gn", num_groups=32, initial_pad=0,
     ):
         super().__init__()
@@ -173,7 +178,7 @@ class UNet(nn.Module):
         self.time_mlp = nn.Sequential(
             PositionalEmbedding(base_channels, time_emb_scale),
             nn.Linear(base_channels, time_emb_dim),
-            nn.SiLU(),
+            SiLU(),
             nn.Linear(time_emb_dim, time_emb_dim),
         ) if time_emb_dim is not None else None
     
